@@ -3,7 +3,7 @@ from __future__ import unicode_literals, absolute_import, division, print_functi
 
 import itertools
 from functools import total_ordering
-from ._common import PokerEnum, _ReprMixin
+from ._common import PokerEnum
 
 
 __all__ = ['Suit', 'Rank', 'Card', 'FACE_RANKS', 'BROADWAY_RANKS']
@@ -73,7 +73,7 @@ class _CardMeta(type):
 
 
 @total_ordering
-class Card(_ReprMixin):
+class Card():
     """Represents a Card, which consists a Rank and a Suit."""
 
     __metaclass__ = _CardMeta
@@ -114,7 +114,7 @@ class Card(_ReprMixin):
             return self.suit < other.suit
         return self.rank < other.rank
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}{}'.format(self.rank, self.suit)
 
     @property

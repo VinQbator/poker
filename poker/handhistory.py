@@ -58,6 +58,7 @@ class IHandHistory(Interface):
     # Player informations
     table_name = Attribute('Name of')
     max_players = Attribute('Maximum number of players can sit on the table.')
+    play_money = Attribute('Maximum number of players can sit on the table.')
     players = Attribute('Tuple of player instances.')
     hero = Attribute('_Player instance with hero data.')
     button = Attribute('_Player instance of button.')
@@ -157,11 +158,11 @@ class _BaseHandHistory(object):
         with io.open(filename, 'rt', encoding='utf-8-sig') as f:
             return cls(f.read())
 
-    def __unicode__(self):
+    def __str__(self):
         return "<{}: #{}>" .format(self.__class__.__name__, self.ident)
 
-    def __str__(self):
-        return unicode(self).decode('utf-8')
+    # def __str__(self):
+    #     return unicode(self).decode('utf-8')
 
     @property
     def board(self):

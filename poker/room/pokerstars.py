@@ -34,6 +34,8 @@ class _Street(hh._BaseStreet):
                 action = self._parse_muck(line)
             elif ' said, "' in line:  # skip chat lines
                 continue
+            elif 'leaves the table' in line: # skip general notifications
+                continue
             elif ':' in line:
                 action = self._parse_player_action(line)
             else:
@@ -48,6 +50,7 @@ class _Street(hh._BaseStreet):
         amount = line[first_paren_index + 1:second_paren_index]
         name_start_index = line.find('to ') + 3
         name = line[name_start_index:]
+        amount = amount.replace('$', '').replace('€', '').replace('£', '')
         return name, Action.RETURN, Decimal(amount)
 
     def _parse_collected(self, line):
@@ -56,6 +59,7 @@ class _Street(hh._BaseStreet):
         second_space_index = line.find(' ', first_space_index + 1)
         third_space_index = line.find(' ', second_space_index + 1)
         amount = line[second_space_index + 1:third_space_index]
+        amount = amount.replace('$', '').replace('€', '').replace('£', '')
         self.pot = Decimal(amount)
         return name, Action.WIN, self.pot
 
@@ -70,6 +74,7 @@ class _Street(hh._BaseStreet):
         amount, _, _ = amount.partition(' ')
 
         if amount:
+            amount = amount.replace('$', '').replace('€', '').replace('£', '')
             return name, Action(action), Decimal(amount)
         else:
             return name, Action(action), None
@@ -105,11 +110,11 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
                         -\s+.+?\s+                                    # localized date
                         \[(?P<date>.+?)\]                             # ET date
                         """, re.VERBOSE)
-    _table_re = re.compile(r"^Table '(.*)' (\d+)-max Seat #(?P<button>\d+) is the button")
+    _table_re = re.compile(r"^Table '(.*)' (\d+)-max (.*)?Seat #(?P<button>\d+) is the button")
     _seat_re = re.compile(r"^Seat (?P<seat>\d+): (?P<name>.+?) \(\$?(?P<stack>\d+(\.\d+)?) in chips\)")  # noqa
     _hero_re = re.compile(r"^Dealt to (?P<hero_name>.+?) \[(..) (..)\]")
-    _pot_re = re.compile(r"^Total pot (\d+(?:\.\d+)?) .*\| Rake (\d+(?:\.\d+)?)")
-    _winner_re = re.compile(r"^Seat (\d+): (.+?) collected \((\d+(?:\.\d+)?)\)")
+    _pot_re = re.compile(r"^Total pot (.\d+(?:\.\d+)?) .*\| Rake (.\d+(?:\.\d+)?)")
+    _winner_re = re.compile(r"^Seat (\d+): (.+?) \((.*)\) collected \((.\d+(?:\.\d+)?)\)")
     _showdown_re = re.compile(r"^Seat (\d+): (.+?) showed \[.+?\] and won")
     _ante_re = re.compile(r".*posts the ante (\d+(?:\.\d+)?)")
     _board_re = re.compile(r"(?<=[\[ ])(..)(?=[\] ])")
@@ -189,6 +194,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
         self._table_match = self._table_re.match(self._splitted[1])
         self.table_name = self._table_match.group(1)
         self.max_players = int(self._table_match.group(2))
+        self.play_money = self._table_match.group(3) == '(Play Money)'
 
     def _parse_players(self):
         self.players = self._init_seats(self.max_players)
@@ -200,7 +206,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
             index = int(match.group('seat')) - 1
             self.players[index] = hh._Player(
                 name=match.group('name'),
-                stack=int(match.group('stack')),
+                stack=float(match.group('stack')),
                 seat=int(match.group('seat')),
                 combo=None
             )
@@ -250,7 +256,9 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
     def _parse_pot(self):
         potline = self._splitted[self._sections[-1] + 2]
         match = self._pot_re.match(potline)
-        self.total_pot = int(match.group(1))
+        amount = match.group(1)
+        amount = amount.replace('$', '').replace('€', '').replace('£', '')
+        self.total_pot = float(amount)
 
     def _parse_board(self):
         boardline = self._splitted[self._sections[-1] + 3]

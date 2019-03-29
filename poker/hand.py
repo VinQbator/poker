@@ -8,7 +8,7 @@ import functools
 from decimal import Decimal
 from pathlib import Path
 from cached_property import cached_property
-from ._common import PokerEnum, _ReprMixin
+from ._common import PokerEnum
 from .card import Rank, Card, BROADWAY_RANKS
 
 
@@ -62,7 +62,7 @@ class _HandMeta(type):
 
 
 @functools.total_ordering
-class Hand(_ReprMixin):
+class Hand(metaclass=_HandMeta):
     """General hand without a precise suit. Only knows about two ranks and shape."""
     __metaclass__ = _HandMeta
     __slots__ = ('first', 'second', '_shape')
@@ -94,7 +94,7 @@ class Hand(_ReprMixin):
 
         return self
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}{}{}'.format(self.first, self.second, self.shape)
 
     def __hash__(self):
@@ -209,7 +209,7 @@ SUITED_HANDS = tuple(hand for hand in Hand if hand.is_suited)
 
 
 @functools.total_ordering
-class Combo(_ReprMixin):
+class Combo():
     """Hand combination."""
 
     __slots__ = ('first', 'second')
@@ -235,7 +235,7 @@ class Combo(_ReprMixin):
         self._set_cards_in_order(first, second)
         return self
 
-    def __unicode__(self):
+    def __str__(self):
         return '{}{}'.format(self.first, self.second)
 
     def __hash__(self):
@@ -607,7 +607,7 @@ class Range(object):
     @classmethod
     def from_objects(cls, iterable):
         """Make an instance from an iterable of Combos, Hands or both."""
-        range_string = ' '.join(unicode(obj) for obj in iterable)
+        range_string = ' '.join(str(obj) for obj in iterable)
         return cls(range_string)
 
     def __eq__(self, other):
@@ -625,7 +625,7 @@ class Range(object):
             return item in self._combos or item.to_hand() in self._hands
         elif isinstance(item, Hand):
             return item in self._all_hands
-        elif isinstance(item, unicode):
+        elif isinstance(item, str):
             if len(item) == 4:
                 combo = Combo(item)
                 return combo in self._combos or combo.to_hand() in self._hands
@@ -635,15 +635,15 @@ class Range(object):
     def __len__(self):
         return self._count_combos()
 
-    def __unicode__(self):
-        return ', '.join(self.rep_pieces)
+    # def __unicode__(self):
+    #     return ', '.join(self.rep_pieces)
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return ', '.join(self.rep_pieces)
 
     def __repr__(self):
-        range = ' '.join(self.rep_pieces)
-        return "{}('{}')".format(self.__class__.__name__, range).encode('utf-8')
+        range_ = ' '.join(self.rep_pieces)
+        return "{}('{}')".format(self.__class__.__name__, range_)
 
     def __getstate__(self):
         return {'_hands': self._hands, '_combos': self._combos}
@@ -683,7 +683,7 @@ class Range(object):
                 hand = Hand(row.val + col.val + suit)
 
                 if hand in self.hands:
-                    html.append(unicode(hand))
+                    html.append(str(hand))
 
                 html.append('</td>')
 
@@ -715,7 +715,7 @@ class Range(object):
                     suit = ''
 
                 hand = Hand(row.val + col.val + suit)
-                hand = unicode(hand) if hand in self.hands else ''
+                hand = str(hand) if hand in self.hands else ''
                 table.append(border)
                 table.append(hand.ljust(4))
 
@@ -790,7 +790,7 @@ class Range(object):
         first = last = pieces[0]
         for current in pieces[1:]:
             if isinstance(last, Combo):
-                str_pieces.append(unicode(last))
+                str_pieces.append(str(last))
                 first = last = current
             elif isinstance(current, Combo):
                 str_pieces.append(self._get_format(first, last))
@@ -810,7 +810,7 @@ class Range(object):
 
     def _get_format(self, first, last):
         if first == last:
-            return unicode(first)
+            return str(first)
         elif (first.is_pair and first.first.val == 'A' or
                     Rank.difference(first.first, first.second) == 1):
             return '%s+' % last
