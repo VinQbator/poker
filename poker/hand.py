@@ -8,7 +8,7 @@ import functools
 from decimal import Decimal
 from pathlib import Path
 from cached_property import cached_property
-from ._common import PokerEnum
+from ._common import PokerEnum, _ReprMixin
 from .card import Rank, Card, BROADWAY_RANKS
 
 
@@ -62,7 +62,7 @@ class _HandMeta(type):
 
 
 @functools.total_ordering
-class Hand(metaclass=_HandMeta):
+class Hand(_ReprMixin, metaclass=_HandMeta):
     """General hand without a precise suit. Only knows about two ranks and shape."""
     __metaclass__ = _HandMeta
     __slots__ = ('first', 'second', '_shape')
@@ -99,6 +99,9 @@ class Hand(metaclass=_HandMeta):
 
     def __hash__(self):
         return hash(self.first) + hash(self.second) + hash(self.shape)
+
+    def __getnewargs__(self):
+        return (str(self),)
 
     def __getstate__(self):
         return {'first': self.first, 'second': self.second, '_shape': self._shape}
@@ -209,7 +212,7 @@ SUITED_HANDS = tuple(hand for hand in Hand if hand.is_suited)
 
 
 @functools.total_ordering
-class Combo():
+class Combo(_ReprMixin):
     """Hand combination."""
 
     __slots__ = ('first', 'second')
@@ -240,6 +243,9 @@ class Combo():
 
     def __hash__(self):
         return hash(self.first) + hash(self.second)
+
+    def __getnewargs__(self):
+        return (str(self),)
 
     def __getstate__(self):
         return {'first': self.first, 'second': self.second}
@@ -342,7 +348,7 @@ class Combo():
 
 
 class _RegexRangeLexer(object):
-    _separator_re = re.compile(r"[,;\s]*")
+    _separator_re = re.compile(r"[,;\s]+")
     _rank = r"([2-9TJQKA])"
     _suit = r"[cdhs♣♦♥♠]"
     # the second card is not the same as the first
@@ -386,14 +392,19 @@ class _RegexRangeLexer(object):
     # compile regexes when initializing class, so every instance will have them precompiled
     rules = [(name, re.compile(regex, re.IGNORECASE), method) for (name, regex, method) in rules]
 
-    def __init__(self, range=''):
+    def __init__(self, range_=''):
         # filter out empty matches
-        self.tokens = [token for token in self._separator_re.split(range) if token]
+        #print('Range: %s' % range_)
+        separated = self._separator_re.split(range_)
+        #print('Separated: %s' % separated)
+        self.tokens = [token for token in separated if token]
+        #print(self.tokens)
 
     def __iter__(self):
         """Goes through all the tokens and compare them with the regex rules. If it finds a match,
         makes an appropriate value for the token and yields them.
         """
+        #print(self.tokens)
         for token in self.tokens:
             for name, regex, method_name in self.rules:
                 if regex.match(token):
@@ -462,11 +473,13 @@ class Range(object):
     """Parses a str range into tuple of Combos (or Hands)."""
     slots = ('_hands', '_combos')
 
-    def __init__(self, range=''):
+    def __init__(self, range_=''):
         self._hands = set()
         self._combos = set()
 
-        for name, value in _RegexRangeLexer(range):
+        #print(type(range_), range_)
+        for name, value in _RegexRangeLexer(range_):
+            #print(name, value)
             if name == 'ALL':
                 for card in itertools.combinations('AKQJT98765432', 2):
                     self._add_offsuit(card)

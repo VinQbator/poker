@@ -79,16 +79,16 @@ def test_equal_pairs_are_not_less():
     assert (Combo('2s2c') > Combo('2s2c')) is False
 
 
-def test_unicode():
+def test_alternate_values():
     assert Combo('AsAh') == Combo('A♠A♥')
     assert Combo('5s5h') > Combo('J♠T♠')
     assert Combo('5s5h') >= Combo('J♠T♠')
 
 
 def test_repr():
-    assert unicode(Combo('2s2c')) == '2♠2♣'
-    assert unicode(Combo('KhAs')) == 'A♠K♥'
-    assert unicode(Combo('ThTd')) == 'T♥T♦'
+    assert str(Combo('2s2c')) == '2♠2♣'
+    assert str(Combo('KhAs')) == 'A♠K♥'
+    assert str(Combo('ThTd')) == 'T♥T♦'
 
 
 def test_is_suited():
@@ -157,7 +157,7 @@ def test_from_cards():
 
     combination = Combo.from_cards(Card('Kh'), Card('As'))
     assert combination == Combo('AsKh')
-    assert repr(combination) == b"Combo('A♠K♥')"
+    assert repr(combination) == "Combo('A♠K♥')"
 
 
 def test_shape_property():

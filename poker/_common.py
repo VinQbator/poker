@@ -3,8 +3,12 @@ from __future__ import unicode_literals, absolute_import, division, print_functi
 
 import random
 import functools
-from collections import Iterable
+from collections.abc import Iterable
 
+import warnings
+
+warnings.catch_warnings()
+warnings.filterwarnings('ignore', category=DeprecationWarning, message=r'inspect.getargspec()')
 from aenum import MultiValueEnum, EnumMeta
 
 class _PokerEnumMeta(EnumMeta):
@@ -58,15 +62,25 @@ class _OrderableMixin(object):
 
 
 class PokerEnum(_OrderableMixin, MultiValueEnum, metaclass=_PokerEnumMeta):
-    __metaclass__ = _PokerEnumMeta
+    #__metaclass__ = _PokerEnumMeta
 
-    # def __str__(self):
-    #     return str(self._value_[0])
+    # def __new__(typ, *args, **kwargs):
+    #     with warnings.catch_warnings():
+    #         warnings.filterwarnings('ignore', category=DeprecationWarning)
+    #         print('BOOM')
+    #         # if len(args) > 0:
+    #         #     for arg in args:
+    #         #         print('Arg: %s-%s' % (arg, type(arg)))
+    #         obj = super().__new__(typ, *args, **kwargs)
+    #     return obj
+    
+    def __str__(self):
+        return str(self._value_)
 
-    # def __repr__(self):
-    #     val = self._value_[0]
-    #     apostrophe = "'" if isinstance(val, str) else ''
-    #     return "{0}({1}{2}{1})".format(self.__class__.__name__, apostrophe, val)
+    def __repr__(self):
+        val = self._value_[0]
+        apostrophe = "'" if isinstance(val, str) else ''
+        return "{0}({1}{2}{1})".format(self.__class__.__name__, apostrophe, val)
 
     # def __format__(self, format_spec):
     #     return str(self._value_[0])
@@ -74,15 +88,15 @@ class PokerEnum(_OrderableMixin, MultiValueEnum, metaclass=_PokerEnumMeta):
     @property
     def val(self):
         """The first value of the Enum member."""
-        return self._value_[0]
+        return self._value_#[0]
 
 
-# class _ReprMixin(object):
-#     # def __str__(self):
-#     #     return str(self)
+class _ReprMixin(object):
+    # def __str__(self):
+    #     return str(self)
 
-#     def __repr__(self):
-#         return "{}('{}')".format(self.__class__.__name__, self.__str__())
+    def __repr__(self):
+        return "{}('{}')".format(self.__class__.__name__, self.__str__())
 
 
 def _make_float(string):

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import, division, print_function
 
+import warnings
 import itertools
 from functools import total_ordering
 from ._common import PokerEnum
@@ -12,10 +13,10 @@ __all__ = ['Suit', 'Rank', 'Card', 'FACE_RANKS', 'BROADWAY_RANKS']
 class Suit(PokerEnum):
     __order__ = 'CLUBS DIAMONDS HEARTS SPADES'
 
-    CLUBS = '♣', 'c', 'clubs'
-    DIAMONDS = '♦', 'd', 'diamonds'
-    HEARTS = '♥', 'h', 'hearts'
-    SPADES = '♠', 's', 'spades'
+    CLUBS = '♣', 'c', 'C', 'clubs'
+    DIAMONDS = '♦', 'd', 'D', 'diamonds'
+    HEARTS = '♥', 'h', 'H', 'hearts'
+    SPADES = '♠', 's', 'S', 'spades'
     # Can't make alias with redefined value property
     # because of a bug in stdlib enum module (line 162)
     # C = '♣', 'c', 'C', 'clubs'
@@ -32,11 +33,11 @@ class Rank(PokerEnum):
     SEVEN = '7', 7
     EIGHT = '8', 8
     NINE = '9', 9
-    TEN = 'T', 10
-    JACK = 'J',
-    QUEEN = 'Q',
-    KING = 'K',
-    ACE = 'A', 1
+    TEN = 'T', 't', 10
+    JACK = 'J', 'j'
+    QUEEN = 'Q', 'q'
+    KING = 'K', 'k'
+    ACE = 'A', 'a', 1
 
     @classmethod
     def difference(cls, first, second):
@@ -56,16 +57,20 @@ BROADWAY_RANKS = Rank('T'), Rank('J'), Rank('Q'), Rank('K'), Rank('A')
 class _CardMeta(type):
     def __new__(metacls, clsname, bases, classdict):
         """Cache all possible Card instances on the class itself."""
-        cls = super(_CardMeta, metacls).__new__(metacls, clsname, bases, classdict)
-        cls._all_cards = list(cls('{}{}'.format(rank, suit))
-                              for rank, suit in itertools.product(Rank, Suit))
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            cls = super(_CardMeta, metacls).__new__(metacls, clsname, bases, classdict)
+            cls._all_cards = list(cls('{}{}'.format(rank, suit))
+                                  for rank, suit in itertools.product(Rank, Suit))
         return cls
 
     def make_random(cls):
         """Returns a random Card instance."""
         self = object.__new__(cls)
-        self.rank = Rank.make_random()
-        self.suit = Suit.make_random()
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=DeprecationWarning)
+            self.rank = Rank.make_random()
+            self.suit = Suit.make_random()
         return self
 
     def __iter__(cls):
@@ -73,10 +78,10 @@ class _CardMeta(type):
 
 
 @total_ordering
-class Card():
+class Card(metaclass=_CardMeta):
     """Represents a Card, which consists a Rank and a Suit."""
 
-    __metaclass__ = _CardMeta
+    #__metaclass__ = _CardMeta
     __slots__ = ('rank', 'suit')
 
     def __new__(cls, card):
@@ -93,6 +98,9 @@ class Card():
 
     def __hash__(self):
         return hash(self.rank) + hash(self.suit)
+
+    def __getnewargs__(self):
+        return (str(self),)
 
     def __getstate__(self):
         return {'rank': self.rank, 'suit': self.suit}

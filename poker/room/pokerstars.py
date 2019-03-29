@@ -88,33 +88,34 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
     _TZ = pytz.timezone('US/Eastern')  # ET
     _split_re = re.compile(r" ?\*\*\* ?\n?|\n")
     _header_re = re.compile(r"""
-                        ^PokerStars\s+                                # Poker Room
-                        Hand\s+\#(?P<ident>\d+):\s+                   # Hand history id
-                        (Tournament\s+\#(?P<tournament_ident>\d+),\s+ # Tournament Number
-                         ((?P<freeroll>Freeroll)|(                    # buyin is Freeroll
-                          \$?(?P<buyin>\d+(\.\d+)?)                   # or buyin
-                          (\+\$?(?P<rake>\d+(\.\d+)?))?               # and rake
-                          (\s+(?P<currency>[A-Z]+))?                  # and currency
+                        ^PokerStars\s*                                  # Poker Room
+                        (?P<zoom>.*)\s+                                 
+                        Hand\s+\#(?P<ident>\d+):\s+                     # Hand history id
+                        (Tournament\s+\#(?P<tournament_ident>\d+),\s+   # Tournament Number
+                         ((?P<freeroll>Freeroll)|(                      # buyin is Freeroll
+                          [€$£]*?(?P<buyin>\d+(\.\d+)?)                     # or buyin
+                          (\+[€$£]*?(?P<rake>\d+(\.\d+)?))?                 # and rake
+                          (\s+(?P<currency>[A-Z]+))?                    # and currency
                          ))\s+
                         )?
-                        (?P<game>.+?)\s+                              # game
-                        (?P<limit>(?:Pot\s+|No\s+|)Limit)\s+          # limit
-                        (-\s+Level\s+(?P<tournament_level>\S+)\s+)?   # Level (optional)
+                        (?P<game>.+?)\s+                                # game
+                        (?P<limit>(?:Pot\s+|No\s+|)Limit)\s+            # limit
+                        (-\s+Level\s+(?P<tournament_level>\S+)\s+)?     # Level (optional)
                         \(
-                         (((?P<sb>\d+)/(?P<bb>\d+))|(                 # tournament blinds
-                          \$(?P<cash_sb>\d+(\.\d+)?)/                 # cash small blind
-                          \$(?P<cash_bb>\d+(\.\d+)?)                  # cash big blind
-                          (\s+(?P<cash_currency>\S+))?                # cash currency
+                         (((?P<sb>\d+)/(?P<bb>\d+))|(                   # tournament blinds
+                          [€$£]*(?P<cash_sb>\d+(\.\d+)?)/                   # cash small blind
+                          [€$£]*(?P<cash_bb>\d+(\.\d+)?)                    # cash big blind
+                          (\s+(?P<cash_currency>\S+))?                  # cash currency
                          ))
                         \)\s+
-                        -\s+.+?\s+                                    # localized date
-                        \[(?P<date>.+?)\]                             # ET date
+                        -\s+.+?\s+                                      # localized date
+                        \[(?P<date>.+?)\]                               # ET date
                         """, re.VERBOSE)
     _table_re = re.compile(r"^Table '(.*)' (\d+)-max (.*)?Seat #(?P<button>\d+) is the button")
     _seat_re = re.compile(r"^Seat (?P<seat>\d+): (?P<name>.+?) \(\$?(?P<stack>\d+(\.\d+)?) in chips\)")  # noqa
     _hero_re = re.compile(r"^Dealt to (?P<hero_name>.+?) \[(..) (..)\]")
-    _pot_re = re.compile(r"^Total pot (.\d+(?:\.\d+)?) .*\| Rake (.\d+(?:\.\d+)?)")
-    _winner_re = re.compile(r"^Seat (\d+): (.+?) \((.*)\) collected \((.\d+(?:\.\d+)?)\)")
+    _pot_re = re.compile(r"^Total pot (.*\d+(?:\.\d+)?) .*\|.*Rake (.*\d+(?:\.\d+)?)")
+    _winner_re = re.compile(r"^Seat (?P<seat_number>\d+): (?P<player_name>.+?)\s*(\((?P<seat_name>(.*))\)|)\s*collected \((?P<amount>.\d+(?:\.\d+)?)\)")
     _showdown_re = re.compile(r"^Seat (\d+): (.+?) showed \[.+?\] and won")
     _ante_re = re.compile(r".*posts the ante (\d+(?:\.\d+)?)")
     _board_re = re.compile(r"(?<=[\[ ])(..)(?=[\] ])")
@@ -218,6 +219,9 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
     def _parse_hero(self):
         hole_cards_line = self._splitted[self._sections[0] + 2]
         match = self._hero_re.match(hole_cards_line)
+        if match is None:
+            self.her = None
+            return
         hero, hero_index = self._get_hero_from_players(match.group('hero_name'))
         hero.combo = Combo(match.group(2) + match.group(3))
         self.hero = self.players[hero_index] = hero
@@ -274,7 +278,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
         for line in self._splitted[start:]:
             if not self.show_down and "collected" in line:
                 match = self._winner_re.match(line)
-                winners.add(match.group(2))
+                winners.add(match.group('player_name'))
             elif self.show_down and "won" in line:
                 match = self._showdown_re.match(line)
                 winners.add(match.group(2))
@@ -327,7 +331,7 @@ class Notes(object):
     @classmethod
     def from_file(cls, filename):
         """Make an instance from a XML file."""
-        return cls(Path(filename).open().read())
+        return cls(Path(filename).open('rb').read().decode('utf-8'))
 
     @property
     def players(self):
@@ -364,9 +368,9 @@ class Notes(object):
         if label is not None and (label not in self.label_names):
             raise LabelNotFoundError('Invalid label: {}'.format(label))
         if update is None:
-            update = datetime.utcnow()
+            update = str(int(datetime.utcnow().timestamp()))
         # converted to timestamp, rounded to ones
-        update = update.strftime('%s')
+        #update = str(int(time.time()))#update.strftime('%s')
         label_id = self._get_label_id(label)
         new_note = etree.Element('note', player=player, label=label_id, update=update)
         new_note.text = text

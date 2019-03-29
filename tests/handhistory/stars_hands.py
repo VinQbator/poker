@@ -46,7 +46,7 @@ Seat 7: blak_douglas folded before Flop (didn't bet)
 Seat 8: sinus91 folded before Flop (didn't bet)
 Seat 9: STBIJUJA folded before Flop (didn't bet)"""
 
-HAND2 = """\
+HAND2 = """
 PokerStars Hand #105034215446: Tournament #797536898, $3.19+$0.31 USD Hold'em No Limit - Level XI (400/800) - 2013/10/04 23:22:20 CET [2013/10/04 17:22:20 ET]
 Table '797536898 9' 9-max Seat #2 is the button
 Seat 1: RichFatWhale (12910 in chips)
@@ -257,3 +257,62 @@ Seat 6: W2lkm2n folded before Flop (didn't bet)
 Seat 7: sednanref folded before Flop (didn't bet)
 Seat 8: daoudi007708 folded on the River
 Seat 9: IPODpoker88 folded before Flop (didn't bet)"""
+
+HAND6 = """
+PokerStars Hand #125406051769:  Hold'em No Limit (€0.10/€0.25 EUR) - 2014/11/19 20:41:45 CET [2014/11/19 14:41:45 ET]
+Table 'Glauke II' 6-max Seat #5 is the button
+Seat 1: Katerina_xx (€42.22 in chips) 
+Seat 2: Davlet77 (€27.75 in chips) 
+Seat 3: daroskass (€36.52 in chips) 
+Seat 5: slardar3 (€26.05 in chips) 
+pepel_archi will be allowed to play after the button
+Katerina_xx: posts small blind €0.10
+Davlet77: posts big blind €0.25
+*** HOLE CARDS ***
+daroskass: folds 
+slardar3: folds 
+Katerina_xx: raises €0.45 to €0.70
+Davlet77: raises €1.30 to €2
+Katerina_xx: folds 
+Uncalled bet (€1.30) returned to Davlet77
+Davlet77 collected €1.40 from pot
+*** SUMMARY ***
+Total pot €1.40 | Rake €0 
+Seat 1: Katerina_xx (small blind) folded before Flop
+Seat 2: Davlet77 (big blind) collected (€1.40)
+Seat 3: daroskass folded before Flop (didn't bet)
+Seat 5: slardar3 (button) folded before Flop (didn't bet)
+"""
+
+HAND7 = """
+PokerStars Hand #125405746787:  Hold'em No Limit ($0.10/$0.25 USD) - 2014/11/19 20:37:31 CET [2014/11/19 14:37:31 ET]
+Table 'Aladfar II' 6-max Seat #4 is the button
+Seat 1: stationftw ($25.35 in chips) 
+Seat 2: jakkefp ($27.98 in chips) 
+Seat 3: Silt 03 ($35.56 in chips) 
+Seat 4: rafsilva ($25 in chips) 
+Seat 5: VinQbator ($25 in chips) 
+Seat 6: AimlessChimp ($31.29 in chips) 
+VinQbator: posts small blind $0.10
+AimlessChimp: posts big blind $0.25
+*** HOLE CARDS ***
+Dealt to VinQbator [Qh Ac]
+stationftw: raises $0.31 to $0.56
+jakkefp: folds 
+Silt 03: raises $0.69 to $1.25
+rafsilva: folds 
+VinQbator: folds 
+AimlessChimp: folds 
+stationftw: folds 
+Uncalled bet ($0.69) returned to Silt 03
+Silt 03 collected $1.47 from pot
+Silt 03: doesn't show hand 
+*** SUMMARY ***
+Total pot $1.47 | Rake $0 
+Seat 1: stationftw folded before Flop
+Seat 2: jakkefp folded before Flop (didn't bet)
+Seat 3: Silt 03 collected ($1.47)
+Seat 4: rafsilva (button) folded before Flop (didn't bet)
+Seat 5: VinQbator (small blind) folded before Flop
+Seat 6: AimlessChimp (big blind) folded before Flop
+"""
