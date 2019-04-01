@@ -26,7 +26,7 @@ class GameType(PokerEnum):
 
 class Game(PokerEnum):
     HOLDEM = "Hold'em", 'HOLDEM', "HOLD'EM"
-    OMAHA = 'Omaha',
+    OMAHA = 'Omaha', 'OMAHA'
     OHILO = 'Omaha Hi/Lo',
     RAZZ = 'Razz',
     STUD = 'Stud',

@@ -242,7 +242,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
             hole_cards_line = self._splitted[self._sections[0] + 2]
             match = self._hero_re.match(hole_cards_line)
             if match is None:
-                self.her = None
+                self.hero = None
                 return
             hero, hero_index = self._get_hero_from_players(match.group('hero_name'))
             hero.combo = Combo(match.group(2) + match.group(3))

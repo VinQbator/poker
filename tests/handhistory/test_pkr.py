@@ -80,10 +80,10 @@ class TestHoldemHand:
             'Capricorn calls $1.25')),
         ('turn', Card('Js')),
         ('turn_pot', D('10.97')),
-        ('turn_actions', ('barly123 checks', 'Capricorn checks')),
+        ('turn_actions', ('barly123 checks', 'Capricorn checks', 'Pot sizes: $10.97')),
         ('river', Card('5h')),
         ('river_pot', D('10.97')),
-        ('river_actions', ('barly123 checks', 'Capricorn checks')),
+        ('river_actions', ('barly123 checks', 'Capricorn checks', 'Pot sizes: $10.97')),
         ('total_pot', D('10.97')),
         ('rake', D('0.54')),
         ('winners', ('barly123',)),
@@ -117,3 +117,12 @@ class TestHoldemHand:
 
     def test_flop(self, hand):
         assert isinstance(hand.flop, _Street)
+
+
+def test_all_hands():
+    for key, value in HANDS.items():
+        print('Hand: %s' % (key))
+        hh = PKRHandHistory(value)
+        hh.parse_header()
+        #print('%s\n\n%s\n\n' % (hh._splitted, hh._sections))
+        hh.parse()

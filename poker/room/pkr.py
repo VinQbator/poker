@@ -23,6 +23,8 @@ class _Street(hh._BaseStreet):
         for line in actionlines:
             if line.startswith('Pot sizes:'):
                 self._parse_pot(line)
+            elif 'did not respond in time' in line:
+                continue
             elif ' ' in line:
                 actions.append(hh._PlayerAction(*self._parse_player_action(line)))
             else:
@@ -62,15 +64,15 @@ class PKRHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory):
     _DATE_FORMAT = '%d %b %Y %H:%M:%S'
     _TZ = pytz.UTC
     _SPLIT_CARD_SPACE = slice(0, 3, 2)
-    _STREET_SECTIONS = {'flop': 2, 'turn': 3, 'river': 4}
-    _split_re = re.compile(r"Dealing |\nDealing Cards\n|Taking |Moving |\n")
+    _STREET_SECTIONS = {'flop': 3, 'turn': 4, 'river': 5}
+    _split_re = re.compile(r"Dealing Cards\n|Dealing |Moving |([^\n]*doesn't show|[^\n]*shows[^\n]*)\n|\n")#(r'Dealing Cards\n|Dealing |Taking |Moving |\n')#(r"Dealing |\nDealing Cards\n|Taking |Moving |\n")
     _blinds_re = re.compile(r"^Blinds are now \$([\d.]*) / \$([\d.]*)$")
     _hero_re = re.compile(r"^\[(. .)\]\[(. .)\] to (?P<hero_name>.*)$")
     _seat_re = re.compile(r"^Seat (\d\d?): (.*) - \$([\d.]*) ?(.*)$")
     _sizes_re = re.compile(r"^Pot sizes: \$([\d.]*)$")
     _card_re = re.compile(r"\[(. .)\]")
-    _rake_re = re.compile(r"Rake of \$([\d.]*) from pot \d$")
-    _win_re = re.compile(r"^(.*) wins \$([\d.]*) with: ")
+    _rake_re = re.compile(r"Taking Rake of \$([\d.]*) from pot \d$")
+    _win_re = re.compile(r"^(.*) wins \$([\d.]*)")
 
     def parse_header(self):
         # sections[1] is after blinds, before preflop
@@ -133,69 +135,125 @@ class PKRHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory):
         self.button = self.players[button_seat - 1]
 
     def _parse_hero(self):
-        dealt_row = self._splitted[self._sections[1] + 1]
-        match = self._hero_re.match(dealt_row)
-
-        first = match.group(1)[self._SPLIT_CARD_SPACE]
-        second = match.group(2)[self._SPLIT_CARD_SPACE]
-        hero, hero_index = self._get_hero_from_players(match.group('hero_name'))
-        hero.combo = Combo(first + second)
-        self.hero = self.players[hero_index] = hero
-        if self.button.name == self.hero.name:
-            self.button = self.hero
+        try:
+            if len(self._sections) < 3:
+                self.hero = None
+                return
+            dealt_row = self._splitted[self._sections[2] + 1]
+            match = self._hero_re.match(dealt_row)
+            if match is None:
+                self.hero = None
+                return
+            first = match.group(1)[self._SPLIT_CARD_SPACE]
+            second = match.group(2)[self._SPLIT_CARD_SPACE]
+            hero, hero_index = self._get_hero_from_players(match.group('hero_name'))
+            hero.combo = Combo(first + second)
+            self.hero = self.players[hero_index] = hero
+            if self.button.name == self.hero.name:
+                self.button = self.hero
+        except Exception as e:
+            print('\nParsing hero failed:\nsections: %s\nsplitted: %s\nplayers: %s' % (self._sections, self._splitted, self.players))
+            raise e
 
     def _parse_preflop(self):
-        start = self._sections[1] + 2
-        stop = self._splitted.index('', start + 1) - 1
+        start_section = 2 if self.hero else 1
+        start = self._sections[start_section] + 2
+        #start = self._sections[2] + 2
+        #print(start)
+        if len(self._sections) < start_section + 2:
+            stop = -1
+        else:
+            stop = self._sections[start_section + 1] - 1
+        #stop = self._splitted.index('', start + 1) - 1
         self.preflop_actions = tuple(self._splitted[start:stop])
 
     def _parse_flop(self):
-        flop_section = self._STREET_SECTIONS['flop']
-        start = self._sections[flop_section] + 1
-        stop = next(v for v in self._sections if v > start)
-        floplines = self._splitted[start:stop]
-        self.flop = _Street(floplines)
+        section = self._STREET_SECTIONS['flop']
+        if not self.hero: section -= 1
+        if len(self._sections) > section + 2:
+            start = self._sections[section]
+            #start = self._sections[flop_section] + 1
+            #stop = next(v for v in self._sections if v > start)
+            from_start = self._splitted[start + 1:]
+            stop = from_start.index(next((v for v in from_start if 'Pot sizes:' in v), None))
+            actions = from_start[:stop+1]
+            #stop = self._splitted.index('', start)
+            #floplines = self._splitted[start:stop]
+            print(actions)
+            self.flop = _Street(actions)
+        else:
+            self.flop = None
+            return
+        # # try:
+        # #     start = self._splitted.index(next((v for v in self._splitted if 'Flop' in v), None))
+        # # except ValueError:
+        # # flop_section = self._STREET_SECTIONS['flop']
+        # # if not self.hero: flop_section -= 1
+        # #start = self._sections[flop_section] + 1
+        # #stop = next(v for v in self._sections if v > start)
+        # from_start = self._splitted[start + 1:]
+        # stop = from_start.index(next((v for v in from_start if 'Pot sizes:' in v), None))
+        # actions = from_start[:stop]
+        # #stop = self._splitted.index('', start)
+        # #floplines = self._splitted[start:stop]
+        # self.flop = _Street(actions)
 
     def _parse_street(self, street):
         section = self._STREET_SECTIONS[street]
-        try:
-            start = self._sections[section] + 1
-
-            street_line = self._splitted[start]
-            cards = list(map(lambda x: x[self._SPLIT_CARD_SPACE],
-                             self._card_re.findall(street_line)))
-            setattr(self, street, Card(cards[0]))
-
-            stop = next(v for v in self._sections if v > start) - 1
-            setattr(self, "{}_actions".format(street), tuple(self._splitted[start + 1:stop]))
-
-            sizes_line = self._splitted[start - 2]
-            pot = Decimal(self._sizes_re.match(sizes_line).group(1))
-            setattr(self, "{}_pot".format(street), pot)
-        except IndexError:
+        if not self.hero: section -= 1
+        if len(self._sections) > section + 1:
+            try:
+                start = self._sections[section] + 1
+                street_line = self._splitted[start]
+                cards = list(map(lambda x: x[self._SPLIT_CARD_SPACE], self._card_re.findall(street_line)))
+                setattr(self, street, Card(cards[0]))
+                from_start = self._splitted[start + 1:]
+                stop = from_start.index(next((v for v in from_start if 'Pot sizes:' in v), None))
+                actions = from_start[:stop+1]
+                setattr(self, "{}_actions".format(street), tuple(actions))
+                sizes_line = self._splitted[start - 2]
+                pot = Decimal(self._sizes_re.match(sizes_line).group(1))
+                setattr(self, "{}_pot".format(street), pot)
+            except Exception as e:
+                print('Failed parsing %s:\npotline: %s\nactions: %s\nsplitted: %s' % (street, sizes_line, actions, self._splitted))
+                raise e
+        else:
             setattr(self, street, None)
             setattr(self, "{}_actions".format(street), None)
             setattr(self, "{}_pot".format(street), None)
 
     def _parse_showdown(self):
-        start = self._sections[-1] + 1
-
-        rake_line = self._splitted[start]
-        match = self._rake_re.match(rake_line)
-        self.rake = Decimal(match.group(1))
+        start = self._sections[-1] - 1
 
         winners = []
-        total_pot = self.rake
-        for line in self._splitted[start:]:
+        self.total_pot = 0
+        if not self.flop is None:
+            rake_line = self._splitted[start]
+            print('Rake line: %s' % rake_line)
+            match = self._rake_re.match(rake_line)
+            self.rake = Decimal(match.group(1))
+        else:
+            self.rake = Decimal(0)
+        self.total_pot += self.rake
+
+        for line in self._splitted[start+1:]:
+            #print(line)
             if 'shows' in line:
+                #print('shows: %s' % line)
                 self.show_down = True
+            elif 'doesn\'t show' in line:
+                #print('doesn\'t show: %s' % line)
+                self.show_down = False
             elif 'wins' in line:
-                match = self._win_re.match(line)
-                winners.append(match.group(1))
-                total_pot += Decimal(match.group(2))
+                try:
+                    match = self._win_re.match(line)
+                    winners.append(match.group(1))
+                    self.total_pot += Decimal(match.group(2))
+                except:
+                    print('Failed parsing winner: %s' % line)
 
         self.winners = tuple(winners)
-        self.total_pot = total_pot
+
 
     def _parse_extra(self):
         self.extra = dict()

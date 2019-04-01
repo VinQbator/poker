@@ -56,7 +56,8 @@ Seat 2: NikosMRF - $50
 Seat 3: Capricorn - $28.24
 Seat 4: Walkman - $49.75
 Seat 6: barly123 - $55.42
-End of Hand #2433297728"""
+End of Hand #2433297728
+"""
 
 HANDS['holdem_preflop_only'] = """
 Table #52121155 - Rapanui's Leela
@@ -216,7 +217,6 @@ Seat 1: grolongo - $50
 Seat 6: Walkman - $50
 Shuffling Deck
 Moving Button to seat 6
-Moving Button to seat 6
 Walkman posts small blind ($0.25)
 grolongo posts big blind ($0.50)
 Dealing Cards
@@ -224,10 +224,150 @@ Dealing [A s][3 c][5 h][6 s] to Walkman
 Walkman did not respond in time and is folded
 Walkman folds
 Pot sizes: $0.50
-Pot sizes: $0.50
 grolongo doesn't show
 grolongo wins $0.50
 Seat 1: grolongo - $50.25
 Seat 6: Walkman - $49.75
 End of Hand #2433298488
+"""
+
+HANDS['test_case_1'] = """
+Table #44143783 - The Point
+Starting Hand #2044116811
+Start time of hand: 28 Mar 2012 15:32:43
+Last Hand #2044116121
+Game Type: HOLD'EM
+Limit Type: NO LIMIT
+Table Type: RING
+Money Type: REAL MONEY
+Blinds are now $0.10 / $0.25
+Button is at seat 2
+Seat 1: Vinku - $25.60
+Seat 2: GKRaiser - $35.67
+Seat 3: MrNiCeGuy82 - $25
+Seat 4: keliwah - $26.13
+Seat 5: ZaFRiLLa - $16.44
+Seat 6: button06 - $21.40
+Shuffling Deck
+Moving Button to seat 3
+keliwah posts small blind ($0.10)
+ZaFRiLLa posts big blind ($0.25)
+Dealing Cards
+Dealing [2 s][7 s] to Vinku
+button06 folds
+Vinku folds
+GKRaiser folds
+MrNiCeGuy82 folds
+keliwah raises to $1
+ZaFRiLLa folds
+Pot sizes: $0.50
+keliwah doesn't show
+keliwah wins $0.50
+Seat 1: Vinku - $25.60
+Seat 2: GKRaiser - $35.67
+Seat 3: MrNiCeGuy82 - $25
+Seat 4: keliwah - $26.38
+Seat 5: ZaFRiLLa - $16.19
+Seat 6: button06 - $21.40
+End of Hand #2044116811
+"""
+
+HANDS['test_case_2'] = """
+Table #44147772 - A Big Pair
+Starting Hand #2043903523
+Start time of hand: 28 Mar 2012 07:43:10
+Last Hand #2043903209
+Game Type: HOLD'EM
+Limit Type: NO LIMIT
+Table Type: RING
+Money Type: REAL MONEY
+Blinds are now $0.10 / $0.25
+Button is at seat 5
+Seat 1: Zietse - $54.61
+Seat 2: IceBrezel - $11.18
+Seat 3: Geilie - $14.97
+Seat 4: Bella2008 - $25.45 (away from table)
+Seat 5: welchy - $25
+Seat 6: Vinku - $25
+Shuffling Deck
+Moving Button to seat 1
+IceBrezel posts small blind ($0.10)
+Geilie posts big blind ($0.25)
+Dealing Cards
+welchy folds
+Zietse raises to $0.75
+IceBrezel calls $0.75
+Geilie folds
+Pot sizes: $1.75
+Dealing Flop [6 h][7 s][T d]
+IceBrezel checks
+Zietse bets $1
+IceBrezel folds
+Pot sizes: $1.75
+Taking Rake of $0.08 from pot 1
+Zietse doesn't show
+Zietse wins $1.67
+Seat 1: Zietse - $55.53
+Seat 2: IceBrezel - $10.43
+Seat 3: Geilie - $14.72
+Seat 4: Bella2008 - $25.45
+Seat 5: welchy - $25
+Seat 6: Vinku - $25
+End of Hand #2043903523
+"""
+
+HANDS['test_case_3'] = """
+Table #44147772 - A Big Pair
+Starting Hand #2043906803
+Start time of hand: 28 Mar 2012 07:56:44
+Last Hand #2043906617
+Game Type: HOLD'EM
+Limit Type: NO LIMIT
+Table Type: RING
+Money Type: REAL MONEY
+Blinds are now $0.10 / $0.25
+Button is at seat 1
+Seat 1: Zietse - $58.50
+Seat 2: IceBrezel - $9.16
+Seat 3: Geilie - $14.33
+Seat 4: Bella2008 - $22.50
+Seat 5: welchy - $26.73
+Seat 6: Vinku - $25
+Shuffling Deck
+Moving Button to seat 2
+Geilie posts small blind ($0.10)
+Bella2008 posts big blind ($0.25)
+Dealing Cards
+Dealing [K s][3 c] to Vinku
+welchy folds
+Vinku folds
+Zietse folds
+IceBrezel raises to $0.85
+Geilie calls $0.85
+Bella2008 folds
+Pot sizes: $1.95
+Dealing Flop [J s][2 s][8 h]
+Geilie bets $0.97
+IceBrezel raises to $4.86
+Geilie calls $4.86
+Pot sizes: $11.67
+Dealing Turn [3 h]
+Geilie checks
+IceBrezel bets $3.45 (all-in)
+Geilie calls $3.45
+Pot sizes: $18.57
+IceBrezel shows [8 d][A h]
+Geilie shows [Q s][6 s]
+Dealing River [6 c]
+Pot sizes: $18.57
+Taking Rake of $0.92 from pot 1
+IceBrezel has One Pair: 8s
+IceBrezel wins $17.65 with: One Pair: 8s
+Seat 1: Zietse - $58.50
+Seat 2: IceBrezel - $17.65
+Seat 3: Geilie - $5.17
+Seat 4: Bella2008 - $22.25
+Seat 5: welchy - $26.73
+Seat 6: Vinku - $25
+End of Hand #2043906803
 """

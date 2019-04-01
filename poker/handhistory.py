@@ -209,7 +209,8 @@ class _SplittableHandHistoryMixin(object):
         """Split hand history by sections."""
 
         self._splitted = self._split_re.split(self.raw)
-        self._splitted = [l.strip() for l in self._splitted]
+        #print(self._splitted)
+        self._splitted = [l.strip() for l in list(filter(lambda a: not a is None, self._splitted))]
         # search split locations (basically empty strings)
         self._sections = [ind for ind, elem in enumerate(self._splitted) if not elem]
 
