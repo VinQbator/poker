@@ -1,0 +1,33 @@
+PokerStars Zoom Hand #124977206227:  Hold'em No Limit ($0.05/$0.10) - 2014/11/12 19:45:13 CET [2014/11/12 13:45:13 ET]
+Table 'Klinkenberg' 6-max Seat #1 is the button
+Seat 1: lidersport ($7.01 in chips) 
+Seat 2: Dodo26 ($12 in chips) 
+Seat 3: dennis03823 ($4.75 in chips) 
+Seat 4: VinQbator ($11.20 in chips) 
+Seat 5: boxer821 ($10.16 in chips) 
+Seat 6: igor163361 ($49.31 in chips) 
+Dodo26: posts small blind $0.05
+dennis03823: posts big blind $0.10
+*** HOLE CARDS ***
+Dealt to VinQbator [Ad 8c]
+VinQbator: folds 
+boxer821: raises $0.20 to $0.30
+igor163361: folds 
+lidersport: calls $0.30
+Dodo26: folds 
+dennis03823: folds 
+*** FLOP *** [Jd 6s 6c]
+boxer821: bets $0.40
+lidersport: folds 
+Uncalled bet ($0.40) returned to boxer821
+boxer821 collected $0.72 from pot
+boxer821: doesn't show hand 
+*** SUMMARY ***
+Total pot $0.75 | Rake $0.03 
+Board [Jd 6s 6c]
+Seat 1: lidersport (button) folded on the Flop
+Seat 2: Dodo26 (small blind) folded before Flop
+Seat 3: dennis03823 (big blind) folded before Flop
+Seat 4: VinQbator folded before Flop (didn't bet)
+Seat 5: boxer821 collected ($0.72)
+Seat 6: igor163361 folded before Flop (didn't bet)

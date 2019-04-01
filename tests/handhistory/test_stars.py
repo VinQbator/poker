@@ -541,3 +541,15 @@ def test_parse_all_hands():
         print('HAND%s' % (idx + 1))
         hh = PokerStarsHandHistory(hand)
         hh.parse()
+
+def test_file_and_string_same(testdir):
+    file_path = str(testdir.joinpath('handhistory/hand8.txt'))
+    hh_file = PokerStarsHandHistory.from_file(file_path)
+    hh_str = PokerStarsHandHistory(stars_hands.HAND8)
+    print(bytes(hh_file.raw, encoding='utf-8'),'\n', bytes(hh_str.raw, encoding='utf-8'))
+    #assert len(hh_file.raw) == len(hh_str.raw)
+    #assert hh_file.raw == hh_str.raw
+    hh_file._split_raw()
+    hh_str._split_raw()
+    print(hh_file._splitted,'\n', hh_str._splitted)
+    assert hh_file._splitted == hh_str._splitted

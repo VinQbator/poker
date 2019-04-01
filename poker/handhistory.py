@@ -5,7 +5,8 @@ from __future__ import unicode_literals, absolute_import, division, print_functi
     Poker hand history parser module.
 """
 
-import io
+#import io
+import chardet
 import itertools
 from datetime import datetime
 import attr
@@ -58,7 +59,6 @@ class IHandHistory(Interface):
     # Player informations
     table_name = Attribute('Name of')
     max_players = Attribute('Maximum number of players can sit on the table.')
-    play_money = Attribute('Maximum number of players can sit on the table.')
     players = Attribute('Tuple of player instances.')
     hero = Attribute('_Player instance with hero data.')
     button = Attribute('_Player instance of button.')
@@ -155,8 +155,14 @@ class _BaseHandHistory(object):
 
     @classmethod
     def from_file(cls, filename):
-        with io.open(filename, 'rt', encoding='utf-8-sig') as f:
-            return cls(f.read())
+        with open(filename, 'rb') as f:
+            filetext = f.read()
+            result = chardet.detect(filetext)
+            filetext = filetext.decode(result['encoding'])
+            filetext = filetext.replace('\r', '\n').replace('\n\n', '\n')
+            return cls(filetext)
+        # with io.open(filename, 'rt', encoding='utf-8-sig') as f:
+        #     return cls(f.read())
 
     def __str__(self):
         return "<{}: #{}>" .format(self.__class__.__name__, self.ident)
@@ -203,6 +209,7 @@ class _SplittableHandHistoryMixin(object):
         """Split hand history by sections."""
 
         self._splitted = self._split_re.split(self.raw)
+        self._splitted = [l.strip() for l in self._splitted]
         # search split locations (basically empty strings)
         self._sections = [ind for ind, elem in enumerate(self._splitted) if not elem]
 

@@ -19,8 +19,8 @@ class Currency(PokerEnum):
 
 
 class GameType(PokerEnum):
-    TOUR = 'Tournament', 'TOUR',
-    CASH = 'Cash game', 'CASH', 'RING',
+    TOUR = 'Tournament', 'TOUR'
+    CASH = 'Cash game', 'CASH', 'RING'
     SNG = 'Sit & Go', 'SNG', 'SIT AND GO', 'Sit&go'
 
 
@@ -30,6 +30,9 @@ class Game(PokerEnum):
     OHILO = 'Omaha Hi/Lo',
     RAZZ = 'Razz',
     STUD = 'Stud',
+    OMAHA5 = '5 Card Omaha',
+    BADUGI = 'Badugi',
+    TD27LB = 'Triple Draw 2-7 Lowball'
 
 
 class Limit(PokerEnum):
