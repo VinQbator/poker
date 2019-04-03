@@ -92,12 +92,13 @@ class IHandHistory(Interface):
 
 
 class _BaseStreet(object):
-    def __init__(self, flop):
+    def __init__(self, actions):
+        #print('actions: %s' % actions)
         self.pot = None
         self.actions = None
         self.cards = None
-        self._parse_cards(flop[0])
-        self._parse_actions(flop[1:])
+        self._parse_cards(actions[0])
+        self._parse_actions(actions[1:])
         self._all_combinations = itertools.combinations(self.cards, 2)
 
     @cached_property
@@ -143,6 +144,12 @@ class _BaseStreet(object):
         return (Rank.difference(first.rank, second.rank)
                 for first, second in self._all_combinations)
 
+    def _parse_cards(self, board):
+        raise NotImplementedError()
+    
+    def _parse_actions(self, actions):
+        raise NotImplementedError()
+
 
 class _BaseHandHistory(object):
     """Abstract base class for *all* kinds of parser."""
@@ -170,17 +177,17 @@ class _BaseHandHistory(object):
     # def __str__(self):
     #     return unicode(self).decode('utf-8')
 
-    @property
-    def board(self):
-        """Calculates board from flop, turn and river."""
-        board = []
-        if self.flop:
-            board.extend(self.flop.cards)
-            if self.turn:
-                board.append(self.turn)
-                if self.river:
-                    board.append(self.river)
-        return tuple(board) if board else None
+    # @property
+    # def board(self):
+    #     """Calculates board from flop, turn and river."""
+    #     board = []
+    #     if self.flop:
+    #         board.extend(self.flop.cards)
+    #         if self.turn:
+    #             board.append(self.turn)
+    #             if self.river:
+    #                 board.append(self.river)
+    #     return tuple(board) if board else None
 
     def _parse_date(self, date_string):
         """Parse the date_string and return a datetime object as UTC."""

@@ -45,7 +45,7 @@ def flop():
         'Uncalled bet (80) returned to W2lkm2n',
         'W2lkm2n collected 150 from pot',
         "W2lkm2n: doesn't show hand"
-        ], 0)
+        ])
 
 
 def test_open_from_file(testdir):
@@ -228,8 +228,6 @@ class TestHandWithFlopOnly:
             "santy312: folds",
             "flavio766: folds"
         )),
-        ('turn_actions', None),
-        ('river_actions', None),
         ('total_pot', Decimal(150)),
         ('show_down', False),
         ('winners', ('W2lkm2n',)),
@@ -301,8 +299,6 @@ class TestAllinPreflopHand:
             _Player(name='pmmr', stack=2415, seat=8, combo=None),
             _Player(name='costamar', stack=13070, seat=9, combo=None),
         ]),
-        ('turn', Card('8d')),
-        ('river', Card('Ks')),
         ('board', (Card('3c'), Card('6s'), Card('9d'), Card('8d'), Card('Ks'))),
         ('preflop_actions', (
             "lkenny44: folds",
@@ -315,8 +311,6 @@ class TestAllinPreflopHand:
             "Labahra: folds",
             "Lean Abadia: folds",
             "Uncalled bet (1255) returned to costamar")),
-        ('turn_actions', None),
-        ('river_actions', None),
         ('total_pot', Decimal(26310)),
         ('show_down', True),
         ('winners', ('costamar',)),
@@ -343,6 +337,28 @@ class TestAllinPreflopHand:
 
     def test_flop(self, hand):
         assert isinstance(hand.flop, _Street)
+
+    @pytest.mark.parametrize(('attribute', 'expected_value'), [
+        ('actions', None),
+        ('cards', (Card('8d'),)),
+        ('players', None)
+    ])
+    def test_turn_attributes(self, hand, attribute, expected_value):
+        assert getattr(hand.turn, attribute) == expected_value
+
+    def test_turn(self, hand):
+        assert isinstance(hand.turn, _Street)
+
+    @pytest.mark.parametrize(('attribute', 'expected_value'), [
+        ('actions', None),
+        ('cards', (Card('Ks'),)),
+        ('players', None)
+    ])
+    def test_river_attributes(self, hand, attribute, expected_value):
+        assert getattr(hand.river, attribute) == expected_value
+
+    def test_river(self, hand):
+        assert isinstance(hand.river, _Street)
 
     @pytest.mark.xfail
     def test_flop_pot(self, hand):
@@ -401,8 +417,6 @@ class TestBodyMissingPlayerNoBoard:
             'Theralion collected 1900 from pot',
             "Theralion: doesn't show hand"
         )),
-        ('turn_actions', None),
-        ('river_actions', None),
         ('total_pot', Decimal(1900)),
         ('show_down', False),
         ('winners', ('Theralion',)),
@@ -450,8 +464,6 @@ class TestBodyEveryStreet:
             _Player(name='sinus91', stack=3000, seat=8, combo=None),
             _Player(name='STBIJUJA', stack=1205, seat=9, combo=None),
         ]),
-        ('turn', Card('8c')),
-        ('river', Card('Kd')),
         ('board', (Card('6s'), Card('4d'), Card('3s'), Card('8c'), Card('Kd'))),
         ('preflop_actions', (
             'sinus91: folds',
@@ -463,18 +475,6 @@ class TestBodyEveryStreet:
             'W2lkm2n: folds',
             'MISTRPerfect: folds',
             'blak_douglas: calls 125')),
-        ('turn_actions', (
-            'blak_douglas: checks',
-            'flettl2: bets 250',
-            'blak_douglas: calls 250')),
-        ('river_actions', (
-            'blak_douglas: checks',
-            'flettl2: bets 1300',
-            'blak_douglas: folds',
-            'Uncalled bet (1300) returned to flettl2',
-            'flettl2 collected 1300 from pot',
-            "flettl2: doesn't show hand"
-        )),
         ('total_pot', Decimal(1300)),
         ('show_down', False),
         ('winners', ('flettl2',)),
@@ -505,6 +505,39 @@ class TestBodyEveryStreet:
 
     def test_flop(self, hand):
         assert isinstance(hand.flop, _Street)
+
+    @pytest.mark.parametrize(('attribute', 'expected_value'), [
+        ('actions', (
+            _PlayerAction('blak_douglas', Action.CHECK, None),
+            _PlayerAction('flettl2', Action.BET, Decimal(250)),
+            _PlayerAction('blak_douglas', Action.CALL, Decimal(250)),
+        )),
+        ('cards', (Card('8c'),)),
+        ('players', ('blak_douglas', 'flettl2')),
+    ])
+    def test_turn_attributes(self, hand, attribute, expected_value):
+        assert getattr(hand.turn, attribute) == expected_value
+
+    def test_turn(self, hand):
+        assert isinstance(hand.turn, _Street)
+
+    @pytest.mark.parametrize(('attribute', 'expected_value'), [
+        ('actions', (
+            _PlayerAction('blak_douglas', Action.CHECK, None),
+            _PlayerAction('flettl2', Action.BET, Decimal(1300)),
+            _PlayerAction('blak_douglas', Action.FOLD, None),
+            _PlayerAction('flettl2', Action.RETURN, Decimal(1300)),
+            _PlayerAction('flettl2', Action.WIN, Decimal(1300)),
+            _PlayerAction('flettl2', Action.MUCK, None),
+        )),
+        ('cards', (Card('Kd'),)),
+        ('players', ('blak_douglas', 'flettl2')),
+    ])
+    def test_river_attributes(self, hand, attribute, expected_value):
+        assert getattr(hand.river, attribute) == expected_value
+
+    def test_river(self, hand):
+        assert isinstance(hand.river, _Street)
 
     @pytest.mark.xfail
     def test_flop_pot(self, hand):

@@ -21,7 +21,8 @@ __all__ = ['PokerStarsHandHistory', 'Notes']
 
 @implementer(hh.IStreet)
 class _Street(hh._BaseStreet):
-    general_notifications = [
+    _board_re = re.compile(r"(?<=[\[ ])(..)(?=[\] ])")
+    _general_notifications = [
             'leaves the table', 
             'is disconnected', 
             'joins the table', 
@@ -34,7 +35,13 @@ class _Street(hh._BaseStreet):
             're-buys'
         ]
     def _parse_cards(self, boardline):
-        self.cards = (Card(boardline[1:3]), Card(boardline[4:6]), Card(boardline[7:9]))
+        cards = self._board_re.findall(boardline)
+        cards = tuple(Card(c) for c in cards)
+        if len(cards) == 3:
+            self.cards = (Card(cards[0]), Card(cards[1]), Card(cards[2]))
+        else:
+            self.cards = (Card(cards[-1]),)
+        
 
     def _parse_actions(self, actionlines):
         actions = []
@@ -47,7 +54,7 @@ class _Street(hh._BaseStreet):
                 action = self._parse_muck(line)
             elif ' said, "' in line:  # skip chat lines
                 continue
-            elif any(((phrase in line) for phrase in _Street.general_notifications)): # skip general notifications
+            elif any(((phrase in line) for phrase in _Street._general_notifications)): # skip general notifications
                 continue
             elif ':' in line:
                 action = self._parse_player_action(line)
@@ -55,7 +62,7 @@ class _Street(hh._BaseStreet):
                 raise RuntimeError("bad action line: " + line)
 
             actions.append(hh._PlayerAction(*action))
-        self.actions = tuple(actions) if actions else None
+        self.actions = tuple(actions) if len(actions) > 0 else None
 
     def _parse_uncalled(self, line):
         first_paren_index = line.find('(')
@@ -270,14 +277,14 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
 
     def _parse_street(self, street):
         try:
-            start = self._splitted.index(street.upper()) + 2
-            stop = self._splitted.index('', start)
-            street_actions = self._splitted[start:stop]
-            setattr(self, "{}_actions".format(street.lower()),
-                    tuple(street_actions) if street_actions else None)
+            start = self._splitted.index(street.upper()) + 1
         except ValueError:
             setattr(self, street, None)
-            setattr(self, '{}_actions'.format(street.lower()), None)
+            return
+        stop = self._splitted.index('', start)
+        street_actions = self._splitted[start:stop]
+        setattr(self, street, _Street(street_actions))
+        #setattr(self, "{}_actions".format(street.lower()), tuple(street_actions[1:]) if street_actions and len(street_actions) > 0 else None)
 
     def _parse_showdown(self):
         self.show_down = 'SHOW DOWN' in self._splitted
@@ -297,10 +304,12 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
     def _parse_board(self):
         boardline = self._splitted[self._sections[-1] + 3]
         if not boardline.startswith('Board'):
+            self.board = None
             return
         cards = self._board_re.findall(boardline)
-        self.turn = Card(cards[3]) if len(cards) > 3 else None
-        self.river = Card(cards[4]) if len(cards) > 4 else None
+        self.board = tuple(Card(c) for c in cards)
+        # self.turn = Card(cards[3]) if len(cards) > 3 else None
+        # self.river = Card(cards[4]) if len(cards) > 4 else None
 
     def _parse_winners(self):
         winners = set()
