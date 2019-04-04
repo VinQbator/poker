@@ -217,23 +217,45 @@ class TestHandWithFlopOnly:
         ('turn', None),
         ('river', None),
         ('board', (Card('2s'), Card('6d'), Card('6h'))),
-        ('preflop_actions', (
-            "strongi82: folds",
-            "W2lkm2n: raises 40 to 60",
-            "MISTRPerfect: calls 60",
-            "blak_douglas: folds",
-            "sinus91: folds",
-            "STBIJUJA: folds",
-            "flettl2: folds",
-            "santy312: folds",
-            "flavio766: folds"
-        )),
+        # ('preflop_actions', (
+        #     "strongi82: folds",
+        #     "W2lkm2n: raises 40 to 60",
+        #     "MISTRPerfect: calls 60",
+        #     "blak_douglas: folds",
+        #     "sinus91: folds",
+        #     "STBIJUJA: folds",
+        #     "flettl2: folds",
+        #     "santy312: folds",
+        #     "flavio766: folds"
+        # )),
         ('total_pot', Decimal(150)),
         ('show_down', False),
         ('winners', ('W2lkm2n',)),
         ])
     def test_body(self, hand, attribute, expected_value):
         assert getattr(hand, attribute) == expected_value
+
+    @pytest.mark.parametrize(('attribute', 'expected_value'), [
+        ('actions', (
+            _PlayerAction('strongi82', Action.FOLD, None),
+            _PlayerAction('W2lkm2n', Action.RAISE, Decimal(60)),
+            _PlayerAction('MISTRPerfect', Action.CALL, Decimal(60)),
+            _PlayerAction('blak_douglas', Action.FOLD, None),
+            _PlayerAction('sinus91', Action.FOLD, None),
+            _PlayerAction('STBIJUJA', Action.FOLD, None),
+            _PlayerAction('flettl2', Action.FOLD, None),
+            _PlayerAction('santy312', Action.FOLD, None),
+            _PlayerAction('flavio766', Action.FOLD, None),
+        )),
+        ('cards', ()),
+        #('players', ('W2lkm2n', 'MISTRPerfect')),
+        #('pot', Decimal(150))
+    ])
+    def test_preflop_attributes(self, hand, attribute, expected_value):
+        assert getattr(hand.preflop, attribute) == expected_value
+
+    def test_preflop(self, hand):
+        assert isinstance(hand.preflop, _Street)
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
@@ -300,17 +322,17 @@ class TestAllinPreflopHand:
             _Player(name='costamar', stack=13070, seat=9, combo=None),
         ]),
         ('board', (Card('3c'), Card('6s'), Card('9d'), Card('8d'), Card('Ks'))),
-        ('preflop_actions', (
-            "lkenny44: folds",
-            "Newfie_187: raises 155 to 955 and is all-in",
-            "Hokolix: folds",
-            "pmmr: folds",
-            "costamar: raises 12040 to 12995 and is all-in",
-            "RichFatWhale: folds",
-            "W2lkm2n: calls 11740 and is all-in",
-            "Labahra: folds",
-            "Lean Abadia: folds",
-            "Uncalled bet (1255) returned to costamar")),
+        # ('preflop_actions', (
+        #     "lkenny44: folds",
+        #     "Newfie_187: raises 155 to 955 and is all-in",
+        #     "Hokolix: folds",
+        #     "pmmr: folds",
+        #     "costamar: raises 12040 to 12995 and is all-in",
+        #     "RichFatWhale: folds",
+        #     "W2lkm2n: calls 11740 and is all-in",
+        #     "Labahra: folds",
+        #     "Lean Abadia: folds",
+        #     "Uncalled bet (1255) returned to costamar")),
         ('total_pot', Decimal(26310)),
         ('show_down', True),
         ('winners', ('costamar',)),
@@ -404,19 +426,19 @@ class TestBodyMissingPlayerNoBoard:
         ('turn', None),
         ('river', None),
         ('board', None),
-        ('preflop_actions', (
-            'EuSh0wTelm0: folds',
-            'panost3: folds',
-            'Samovlyblen: folds',
-            'Theralion: raises 600 to 1200',
-            'wrsport1015: folds',
-            'W2lkm2n: folds',
-            'fischero68: folds',
-            'snelle_jel: folds',
-            'Uncalled bet (600) returned to Theralion',
-            'Theralion collected 1900 from pot',
-            "Theralion: doesn't show hand"
-        )),
+        # ('preflop_actions', (
+        #     'EuSh0wTelm0: folds',
+        #     'panost3: folds',
+        #     'Samovlyblen: folds',
+        #     'Theralion: raises 600 to 1200',
+        #     'wrsport1015: folds',
+        #     'W2lkm2n: folds',
+        #     'fischero68: folds',
+        #     'snelle_jel: folds',
+        #     'Uncalled bet (600) returned to Theralion',
+        #     'Theralion collected 1900 from pot',
+        #     "Theralion: doesn't show hand"
+        # )),
         ('total_pot', Decimal(1900)),
         ('show_down', False),
         ('winners', ('Theralion',)),
@@ -465,16 +487,16 @@ class TestBodyEveryStreet:
             _Player(name='STBIJUJA', stack=1205, seat=9, combo=None),
         ]),
         ('board', (Card('6s'), Card('4d'), Card('3s'), Card('8c'), Card('Kd'))),
-        ('preflop_actions', (
-            'sinus91: folds',
-            'STBIJUJA: folds',
-            'flettl2: raises 125 to 225',
-            'santy312: folds',
-            'flavio766: folds',
-            'strongi82: folds',
-            'W2lkm2n: folds',
-            'MISTRPerfect: folds',
-            'blak_douglas: calls 125')),
+        # ('preflop_actions', (
+        #     'sinus91: folds',
+        #     'STBIJUJA: folds',
+        #     'flettl2: raises 125 to 225',
+        #     'santy312: folds',
+        #     'flavio766: folds',
+        #     'strongi82: folds',
+        #     'W2lkm2n: folds',
+        #     'MISTRPerfect: folds',
+        #     'blak_douglas: calls 125')),
         ('total_pot', Decimal(1300)),
         ('show_down', False),
         ('winners', ('flettl2',)),

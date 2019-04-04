@@ -22,6 +22,12 @@ __all__ = ['PokerStarsHandHistory', 'Notes']
 @implementer(hh.IStreet)
 class _Street(hh._BaseStreet):
     _board_re = re.compile(r"(?<=[\[ ])(..)(?=[\] ])")
+    _action_re = re.compile(r"""(?P<player_name>.*)(?=:):\s+
+                                (?P<action>\S+)\s?
+                                [\[$€£\s\n]?
+                                ((?<=\[)(?P<cards>.+)(?=\])
+                                |.*\s*(?<=[$€£\s])(?P<amount>[\d\.]+)
+                                |)""", re.VERBOSE)
     _general_notifications = [
             'leaves the table', 
             'is disconnected', 
@@ -37,7 +43,9 @@ class _Street(hh._BaseStreet):
     def _parse_cards(self, boardline):
         cards = self._board_re.findall(boardline)
         cards = tuple(Card(c) for c in cards)
-        if len(cards) == 3:
+        if len(cards) == 0:
+            self.cards = ()
+        elif len(cards) == 3:
             self.cards = (Card(cards[0]), Card(cards[1]), Card(cards[2]))
         else:
             self.cards = (Card(cards[-1]),)
@@ -89,19 +97,23 @@ class _Street(hh._BaseStreet):
         return name, Action.MUCK, None
 
     def _parse_player_action(self, line):
-        name, _, action = line.partition(': ')
-        action, _, amount = action.partition(' ')
-        amount, _, _ = amount.partition(' ')
-        if '[' in amount: amount = ''
-        try:
-            if not amount is None and amount != '':
-                return name, Action(action), Decimal(amount.replace('$', '').replace('€', '').replace('£', ''))
-            else:
-                return name, Action(action), None
-        except:
-            print('\n\nFailed parsing player action:\nLine: %s\nname: %s\naction: %s\namount: %s\n' % (line, name, action, repr(amount)))
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback, limit=10, file=sys.stdout)
+        match = _Street._action_re.match(line)
+        amount = match.group('amount')
+        amount = Decimal(amount) if amount else None
+        return match.group('player_name'), Action(match.group('action')), amount
+        # name, _, action = line.partition(': ')
+        # action, _, amount = action.partition(' ')
+        # amount = amount.split(' ')[-1]
+        # if '[' in amount: amount = ''
+        # try:
+        #     if not amount is None and amount != '':
+        #         return name, Action(action), Decimal(amount.replace('$', '').replace('€', '').replace('£', ''))
+        #     else:
+        #         return name, Action(action), None
+        # except:
+        #     print('\n\nFailed parsing player action:\nLine: %s\nname: %s\naction: %s\namount: %s\n' % (line, name, action, repr(amount)))
+        #     exc_type, exc_value, exc_traceback = sys.exc_info()
+        #     traceback.print_exception(exc_type, exc_value, exc_traceback, limit=10, file=sys.stdout)
 
 
 @implementer(hh.IHandHistory)
@@ -263,7 +275,8 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
     def _parse_preflop(self):
         start = self._sections[0] + 3
         stop = self._sections[1]
-        self.preflop_actions = tuple(self._splitted[start:stop])
+        #self.preflop_actions = tuple(self._splitted[start:stop])
+        self.preflop = _Street(['[]'] + self._splitted[start:stop])
 
     def _parse_flop(self):
         try:
