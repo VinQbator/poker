@@ -37,6 +37,7 @@ class IStreet(Interface):
     actions = Attribute('_StreetAction instances.')
     cards = Attribute('Cards.')
     pot = Attribute('Pot size after actions.')
+    street_name = Attribute('StreetName enum value.')
 
 
 class IHandHistory(Interface):
@@ -92,11 +93,12 @@ class IHandHistory(Interface):
 
 
 class _BaseStreet(object):
-    def __init__(self, actions):
+    def __init__(self, actions, street_name):
         #print('actions: %s' % actions)
         self.pot = None
         self.actions = None
         self.cards = None
+        self.street_name = street_name
         self._parse_cards(actions[0])
         self._parse_actions(actions[1:])
         self._all_combinations = itertools.combinations(self.cards, 2)

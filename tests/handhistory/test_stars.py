@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, absolute_import, division, print_function
 
-from decimal import Decimal
+#from decimal import Decimal
 from datetime import datetime
 import pytz
 import pytest
@@ -45,14 +45,14 @@ def flop():
         'Uncalled bet (80) returned to W2lkm2n',
         'W2lkm2n collected 150 from pot',
         "W2lkm2n: doesn't show hand"
-        ])
+        ], 'FLOP')
 
 
 def test_open_from_file(testdir):
     bbb_path = str(testdir.joinpath('handhistory/bbb.txt'))
     hh = PokerStarsHandHistory.from_file(bbb_path)
     hh.parse()
-    assert hh.ident == '138364355489'
+    assert hh.ident == 138364355489
     assert type(hh.raw) is str
 
 
@@ -62,17 +62,17 @@ PokerStars Hand #152455023342: Tournament #1545783901, Freeroll  Hold'em No Limi
     """  # noqa
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
-        ('ident', '152455023342'),
+        ('ident', 152455023342),
         ('game_type', GameType.TOUR),
         ('tournament_ident', '1545783901'),
         ('tournament_level', 'I'),
         ('currency', Currency('USD')),
-        ('buyin', Decimal('0')),
-        ('rake', Decimal('0')),
+        ('buyin', 0),
+        ('rake', 0),
         ('game', Game.HOLDEM),
         ('limit', Limit.NL),
-        ('sb', Decimal(10)),
-        ('bb', Decimal(20)),
+        ('sb', 10),
+        ('bb', 20),
         ('date', ET.localize(datetime(2016, 4, 25, 22, 22, 0))),
         ('extra', {'money_type': MoneyType.REAL}),
         ])
@@ -86,17 +86,17 @@ PokerStars Hand #152504147861: Tournament #1545751329, 870+130 Hold'em No Limit 
     """  # noqa
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
-        ('ident', '152504147861'),
+        ('ident', 152504147861),
         ('game_type', GameType.TOUR),
         ('tournament_ident', '1545751329'),
         ('tournament_level', 'I'),
         ('currency', None),
-        ('buyin', Decimal('870')),
-        ('rake', Decimal('130')),
+        ('buyin', 870),
+        ('rake', 130),
         ('game', Game.HOLDEM),
         ('limit', Limit.NL),
-        ('sb', Decimal(10)),
-        ('bb', Decimal(20)),
+        ('sb', 10),
+        ('bb', 20),
         ('date', ET.localize(datetime(2016, 4, 27, 00, 17, 16))),
         ('extra', {'money_type': MoneyType.PLAY}),
         ])
@@ -110,7 +110,7 @@ PokerStars Hand #153769972916:  Hold'em Limit (10/20) - 2016/05/24 8:52:39 BRT [
     """  # noqa
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
-        ('ident', '153769972916'),
+        ('ident', 153769972916),
         ('game_type', GameType.CASH),
         ('tournament_ident', None),
         ('tournament_level', None),
@@ -119,8 +119,8 @@ PokerStars Hand #153769972916:  Hold'em Limit (10/20) - 2016/05/24 8:52:39 BRT [
         ('rake', None),
         ('game', Game.HOLDEM),
         ('limit', Limit.FL),
-        ('sb', Decimal(10)),
-        ('bb', Decimal(20)),
+        ('sb', 10),
+        ('bb', 20),
         ('date', ET.localize(datetime(2016, 5, 24, 7, 52, 39))),
         ('extra', {'money_type': MoneyType.PLAY}),
         ])
@@ -134,17 +134,17 @@ PokerStars Hand #153719873192: Tournament #1573768726, 184 SC Hold'em No Limit -
     """  # noqa
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
-        ('ident', '153719873192'),
+        ('ident', 153719873192),
         ('game_type', GameType.TOUR),
         ('tournament_ident', '1573768726'),
         ('tournament_level', 'I'),
         ('currency', Currency.STARS_COIN),
-        ('buyin', Decimal(184)),
-        ('rake', Decimal(0)),
+        ('buyin', 184),
+        ('rake', 0),
         ('game', Game.HOLDEM),
         ('limit', Limit.NL),
-        ('sb', Decimal(25)),
-        ('bb', Decimal(50)),
+        ('sb', 25),
+        ('bb', 50),
         ('date', ET.localize(datetime(2016, 5, 23, 5, 48, 22))),
         ('extra', {'money_type': MoneyType.REAL}),
         ])
@@ -158,7 +158,7 @@ PokerStars Hand #107030112846: Omaha Pot Limit ($0.01/$0.02 USD) - 2013/11/15 9:
     """  # noqa
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
-        ('ident', '107030112846'),
+        ('ident', 107030112846),
         ('game_type', GameType.CASH),
         ('tournament_ident', None),
         ('tournament_level', None),
@@ -167,8 +167,8 @@ PokerStars Hand #107030112846: Omaha Pot Limit ($0.01/$0.02 USD) - 2013/11/15 9:
         ('rake', None),
         ('game', Game.OMAHA),
         ('limit', Limit.PL),
-        ('sb', Decimal('0.01')),
-        ('bb', Decimal('0.02')),
+        ('sb', 0.01),
+        ('bb', 0.02),
         ('date', ET.localize(datetime(2013, 11, 14, 20, 3, 10))),
         ('extra', {'money_type': MoneyType.REAL}),
         ])
@@ -182,17 +182,17 @@ class TestHandWithFlopOnly:
     # in py.test 2.4 it is recommended to use string like "attribute,expected",
     # but with tuple, it works in both 2.3.5 and 2.4
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
-        ('ident', '105024000105'),
+        ('ident', 105024000105),
         ('game_type', GameType.TOUR),
         ('tournament_ident', '797469411'),
         ('tournament_level', 'I'),
         ('currency', Currency.USD),
-        ('buyin', Decimal('3.19')),
-        ('rake', Decimal('0.31')),
+        ('buyin', 3.19),
+        ('rake', 0.31),
         ('game', Game.HOLDEM),
         ('limit', Limit.NL),
-        ('sb', Decimal(10)),
-        ('bb', Decimal(20)),
+        ('sb', 10),
+        ('bb', 20),
         ('date', ET.localize(datetime(2013, 10, 4, 13, 53, 27))),
         ])
     def test_values_after_header_parsed(self, hand_header, attribute, expected_value):
@@ -228,7 +228,7 @@ class TestHandWithFlopOnly:
         #     "santy312: folds",
         #     "flavio766: folds"
         # )),
-        ('total_pot', Decimal(150)),
+        ('total_pot', 150),
         ('show_down', False),
         ('winners', ('W2lkm2n',)),
         ])
@@ -238,8 +238,8 @@ class TestHandWithFlopOnly:
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
             _PlayerAction('strongi82', Action.FOLD, None),
-            _PlayerAction('W2lkm2n', Action.RAISE, Decimal(60)),
-            _PlayerAction('MISTRPerfect', Action.CALL, Decimal(60)),
+            _PlayerAction('W2lkm2n', Action.RAISE, 60),
+            _PlayerAction('MISTRPerfect', Action.CALL, 60),
             _PlayerAction('blak_douglas', Action.FOLD, None),
             _PlayerAction('sinus91', Action.FOLD, None),
             _PlayerAction('STBIJUJA', Action.FOLD, None),
@@ -259,10 +259,10 @@ class TestHandWithFlopOnly:
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
-            _PlayerAction('W2lkm2n', Action.BET, Decimal(80)),
+            _PlayerAction('W2lkm2n', Action.BET, 80),
             _PlayerAction('MISTRPerfect', Action.FOLD, None),
-            _PlayerAction('W2lkm2n', Action.RETURN, Decimal(80)),
-            _PlayerAction('W2lkm2n', Action.WIN, Decimal(150)),
+            _PlayerAction('W2lkm2n', Action.RETURN, 80),
+            _PlayerAction('W2lkm2n', Action.WIN, 150),
             _PlayerAction('W2lkm2n', Action.MUCK, None),
         )),
         ('cards', (Card('2s'), Card('6d'), Card('6h'))),
@@ -276,7 +276,7 @@ class TestHandWithFlopOnly:
         ('has_gutshot', True),
         ('has_flushdraw', False),
         ('players', ('W2lkm2n', 'MISTRPerfect')),
-        ('pot', Decimal(150))
+        ('pot', 150)
     ])
     def test_flop_attributes(self, hand, attribute, expected_value):
         assert getattr(hand.flop, attribute) == expected_value
@@ -289,17 +289,17 @@ class TestAllinPreflopHand:
     hand_text = stars_hands.HAND2
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
-        ('ident', '105034215446'),
+        ('ident', 105034215446),
         ('game_type', GameType.TOUR),
         ('tournament_ident', '797536898'),
         ('tournament_level', 'XI'),
         ('currency', Currency.USD),
-        ('buyin', Decimal('3.19')),
-        ('rake', Decimal('0.31')),
+        ('buyin', 3.19),
+        ('rake', 0.31),
         ('game', Game.HOLDEM),
         ('limit', Limit.NL),
-        ('sb', Decimal(400)),
-        ('bb', Decimal(800)),
+        ('sb', 400),
+        ('bb', 800),
         ('date', ET.localize(datetime(2013, 10, 4, 17, 22, 20))),
     ])
     def test_values_after_header_parsed(self, hand_header, attribute, expected_value):
@@ -333,7 +333,7 @@ class TestAllinPreflopHand:
         #     "Labahra: folds",
         #     "Lean Abadia: folds",
         #     "Uncalled bet (1255) returned to costamar")),
-        ('total_pot', Decimal(26310)),
+        ('total_pot', 26310),
         ('show_down', True),
         ('winners', ('costamar',)),
         ])
@@ -384,24 +384,24 @@ class TestAllinPreflopHand:
 
     @pytest.mark.xfail
     def test_flop_pot(self, hand):
-        assert hand.flop.pot == Decimal(26310)
+        assert hand.flop.pot == 26310
 
 
 class TestBodyMissingPlayerNoBoard:
     hand_text = stars_hands.HAND3
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
-         ('ident', '105026771696'),
+         ('ident', 105026771696),
          ('game_type', GameType.TOUR),
          ('tournament_ident', '797469411'),
          ('tournament_level', 'X'),
          ('currency', Currency.USD),
-         ('buyin', Decimal('3.19')),
-         ('rake', Decimal('0.31')),
+         ('buyin', 3.19),
+         ('rake', 0.31),
          ('game', Game.HOLDEM),
          ('limit', Limit.NL),
-         ('sb', Decimal(300)),
-         ('bb', Decimal(600)),
+         ('sb', 300),
+         ('bb', 600),
          ('date', ET.localize(datetime(2013, 10, 4, 14, 50, 56)))
         ])
     def test_values_after_header_parsed(self, hand_header, attribute, expected_value):
@@ -439,7 +439,7 @@ class TestBodyMissingPlayerNoBoard:
         #     'Theralion collected 1900 from pot',
         #     "Theralion: doesn't show hand"
         # )),
-        ('total_pot', Decimal(1900)),
+        ('total_pot', 1900),
         ('show_down', False),
         ('winners', ('Theralion',)),
     ])
@@ -454,17 +454,17 @@ class TestBodyEveryStreet:
     hand_text = stars_hands.HAND4
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
-        ('ident', '105025168298'),
+        ('ident', 105025168298),
         ('game_type', GameType.TOUR),
         ('tournament_ident', '797469411'),
         ('tournament_level', 'IV'),
         ('currency', Currency.USD),
-        ('buyin', Decimal('3.19')),
-        ('rake', Decimal('0.31')),
+        ('buyin', 3.19),
+        ('rake', 0.31),
         ('game', Game.HOLDEM),
         ('limit', Limit.NL),
-        ('sb', Decimal(50)),
-        ('bb', Decimal(100)),
+        ('sb', 50),
+        ('bb', 100),
         ('date', ET.localize(datetime(2013, 10, 4, 14, 19, 17)))
     ])
     def test_values_after_header_parsed(self, hand_header, attribute, expected_value):
@@ -497,7 +497,7 @@ class TestBodyEveryStreet:
         #     'W2lkm2n: folds',
         #     'MISTRPerfect: folds',
         #     'blak_douglas: calls 125')),
-        ('total_pot', Decimal(1300)),
+        ('total_pot', 1300),
         ('show_down', False),
         ('winners', ('flettl2',)),
     ])
@@ -507,8 +507,8 @@ class TestBodyEveryStreet:
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
             _PlayerAction('blak_douglas', Action.CHECK, None),
-            _PlayerAction('flettl2', Action.BET, Decimal(150)),
-            _PlayerAction('blak_douglas', Action.CALL, Decimal(150)),
+            _PlayerAction('flettl2', Action.BET, 150),
+            _PlayerAction('blak_douglas', Action.CALL, 150),
         )),
         ('cards', (Card('6s'), Card('4d'), Card('3s'))),
         ('is_rainbow', False),
@@ -531,8 +531,8 @@ class TestBodyEveryStreet:
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
             _PlayerAction('blak_douglas', Action.CHECK, None),
-            _PlayerAction('flettl2', Action.BET, Decimal(250)),
-            _PlayerAction('blak_douglas', Action.CALL, Decimal(250)),
+            _PlayerAction('flettl2', Action.BET, 250),
+            _PlayerAction('blak_douglas', Action.CALL, 250),
         )),
         ('cards', (Card('8c'),)),
         ('players', ('blak_douglas', 'flettl2')),
@@ -546,10 +546,10 @@ class TestBodyEveryStreet:
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
             _PlayerAction('blak_douglas', Action.CHECK, None),
-            _PlayerAction('flettl2', Action.BET, Decimal(1300)),
+            _PlayerAction('flettl2', Action.BET, 1300),
             _PlayerAction('blak_douglas', Action.FOLD, None),
-            _PlayerAction('flettl2', Action.RETURN, Decimal(1300)),
-            _PlayerAction('flettl2', Action.WIN, Decimal(1300)),
+            _PlayerAction('flettl2', Action.RETURN, 1300),
+            _PlayerAction('flettl2', Action.WIN, 1300),
             _PlayerAction('flettl2', Action.MUCK, None),
         )),
         ('cards', (Card('Kd'),)),
@@ -563,7 +563,7 @@ class TestBodyEveryStreet:
 
     @pytest.mark.xfail
     def test_flop_pot(self, hand):
-        assert hand.flop.pot == Decimal(800)
+        assert hand.flop.pot == 800
 
 
 class TestClassRepresentation:

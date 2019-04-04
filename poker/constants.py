@@ -89,3 +89,10 @@ class Position(PokerEnum):
     BTN = 'BTN', 'bu', 'button'
     SB = 'SB', 'small blind'
     BB = 'BB', 'big blind'
+
+
+class StreetName(PokerEnum):
+    PREFLOP = 'PREFLOP'
+    FLOP = 'FLOP'
+    TURN = 'TURN'
+    RIVER = 'RIVER'
