@@ -244,11 +244,11 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
             # we reached the end of the players section
             if not match:
                 continue
-            index = int(match.group('seat')) - 1
-            self.players[index] = hh._Player(
+            seat = int(match.group('seat'))
+            self.players[seat - 1] = hh._Player(
                 name=match.group('name'),
                 stack=float(match.group('stack')),
-                seat=int(match.group('seat')),
+                seat=seat,
                 combo=None
             )
 

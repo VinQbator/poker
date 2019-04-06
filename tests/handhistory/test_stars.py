@@ -413,7 +413,7 @@ class TestBodyMissingPlayerNoBoard:
         ('button', _Player(name='W2lkm2n', stack=10714, seat=8, combo=Combo('6d8d'))),
         ('hero', _Player(name='W2lkm2n', stack=10714, seat=8, combo=Combo('6d8d'))),
         ('players', [
-            _Player(name='Empty Seat 1', stack=0, seat=1, combo=None),
+            _Player(name='Empty Seat 1', stack=-1, seat=1, combo=None),
             _Player(name='snelle_jel', stack=4295, seat=2, combo=None),
             _Player(name='EuSh0wTelm0', stack=11501, seat=3, combo=None),
             _Player(name='panost3', stack=7014, seat=4, combo=None),
