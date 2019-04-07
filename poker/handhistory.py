@@ -31,6 +31,7 @@ class _PlayerAction(object):
     name = attr.ib()
     action = attr.ib()
     amount = attr.ib()
+    seat = attr.ib()
 
 
 class IStreet(Interface):
@@ -93,12 +94,13 @@ class IHandHistory(Interface):
 
 
 class _BaseStreet(object):
-    def __init__(self, actions, street_name):
+    def __init__(self, actions, street_name, hand_players):
         #print('actions: %s' % actions)
         self.pot = None
         self.actions = None
         self.cards = None
         self.street_name = street_name
+        self._hand_players = hand_players
         self._parse_cards(actions[0])
         self._parse_actions(actions[1:])
         self._all_combinations = itertools.combinations(self.cards, 2)

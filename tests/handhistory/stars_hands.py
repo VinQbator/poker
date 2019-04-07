@@ -1093,3 +1093,50 @@ Seat 7: YaDaDaMeeN21 (button) folded before Flop (didn't bet)
 Seat 8: DomiVY (small blind) folded before Flop
 Seat 9: mb2part (big blind) folded before Flop
 """
+
+HAND26 = """
+PokerStars Hand #126200046491:  Hold'em No Limit ($0.10/$0.25 USD) - 2014/12/03 14:37:57 CET [2014/12/03 8:37:57 ET]
+Table 'Vindobona III' 9-max Seat #6 is the button
+Seat 1: titza01 ($25.04 in chips)
+Seat 2: ESPAVO12:12 ($36.61 in chips)
+Seat 3: x3ultimate ($26.85 in chips)
+Seat 4: zequi1998 ($23.05 in chips)
+Seat 5: madmouse333 ($25.35 in chips)
+Seat 6: juicen_10 ($10.25 in chips)
+Seat 7: kproject1 ($25.80 in chips)
+Seat 8: VinQbator ($47.43 in chips)
+Seat 9: xudzhe ($25.35 in chips)
+kproject1: posts small blind $0.10
+VinQbator: posts big blind $0.25
+*** HOLE CARDS ***
+Dealt to VinQbator [Td 4c]
+xudzhe: folds
+titza01: calls $0.25
+ESPAVO12:12: raises $0.25 to $0.50
+x3ultimate: folds
+zequi1998: folds
+madmouse333: folds
+juicen_10: folds
+kproject1: folds
+VinQbator: folds
+titza01: calls $0.25
+*** FLOP *** [Jc 5s 4h]
+titza01: checks
+ESPAVO12:12: bets $0.75
+titza01: folds
+Uncalled bet ($0.75) returned to ESPAVO12:12
+ESPAVO12:12 collected $1.29 from pot
+ESPAVO12:12: doesn't show hand
+*** SUMMARY ***
+Total pot $1.35 | Rake $0.06
+Board [Jc 5s 4h]
+Seat 1: titza01 folded on the Flop
+Seat 2: ESPAVO12:12 collected ($1.29)
+Seat 3: x3ultimate folded before Flop (didn't bet)
+Seat 4: zequi1998 folded before Flop (didn't bet)
+Seat 5: madmouse333 folded before Flop (didn't bet)
+Seat 6: juicen_10 (button) folded before Flop (didn't bet)
+Seat 7: kproject1 (small blind) folded before Flop
+Seat 8: VinQbator (big blind) folded before Flop
+Seat 9: xudzhe folded before Flop (didn't bet)
+"""

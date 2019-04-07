@@ -237,15 +237,15 @@ class TestHandWithFlopOnly:
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
-            _PlayerAction('strongi82', Action.FOLD, None),
-            _PlayerAction('W2lkm2n', Action.RAISE, 60),
-            _PlayerAction('MISTRPerfect', Action.CALL, 60),
-            _PlayerAction('blak_douglas', Action.FOLD, None),
-            _PlayerAction('sinus91', Action.FOLD, None),
-            _PlayerAction('STBIJUJA', Action.FOLD, None),
-            _PlayerAction('flettl2', Action.FOLD, None),
-            _PlayerAction('santy312', Action.FOLD, None),
-            _PlayerAction('flavio766', Action.FOLD, None),
+            _PlayerAction('strongi82', Action.FOLD, 0, 4),
+            _PlayerAction('W2lkm2n', Action.RAISE, 60, 5),
+            _PlayerAction('MISTRPerfect', Action.CALL, 60, 6),
+            _PlayerAction('blak_douglas', Action.FOLD, 0, 7),
+            _PlayerAction('sinus91', Action.FOLD, 0, 8),
+            _PlayerAction('STBIJUJA', Action.FOLD, 0, 9),
+            _PlayerAction('flettl2', Action.FOLD, 0, 1),
+            _PlayerAction('santy312', Action.FOLD, 0, 2),
+            _PlayerAction('flavio766', Action.FOLD, 0, 3),
         )),
         ('cards', ()),
         #('players', ('W2lkm2n', 'MISTRPerfect')),
@@ -259,11 +259,11 @@ class TestHandWithFlopOnly:
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
-            _PlayerAction('W2lkm2n', Action.BET, 80),
-            _PlayerAction('MISTRPerfect', Action.FOLD, None),
-            _PlayerAction('W2lkm2n', Action.RETURN, 80),
-            _PlayerAction('W2lkm2n', Action.WIN, 150),
-            _PlayerAction('W2lkm2n', Action.MUCK, None),
+            _PlayerAction('W2lkm2n', Action.BET, 80, 5),
+            _PlayerAction('MISTRPerfect', Action.FOLD, 0, 6),
+            _PlayerAction('W2lkm2n', Action.RETURN, 80, 5),
+            _PlayerAction('W2lkm2n', Action.WIN, 150, 5),
+            _PlayerAction('W2lkm2n', Action.MUCK, 0, 5),
         )),
         ('cards', (Card('2s'), Card('6d'), Card('6h'))),
         ('is_rainbow', True),
@@ -506,9 +506,9 @@ class TestBodyEveryStreet:
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
-            _PlayerAction('blak_douglas', Action.CHECK, None),
-            _PlayerAction('flettl2', Action.BET, 150),
-            _PlayerAction('blak_douglas', Action.CALL, 150),
+            _PlayerAction('blak_douglas', Action.CHECK, 0, 7),
+            _PlayerAction('flettl2', Action.BET, 150, 1),
+            _PlayerAction('blak_douglas', Action.CALL, 150, 7),
         )),
         ('cards', (Card('6s'), Card('4d'), Card('3s'))),
         ('is_rainbow', False),
@@ -530,9 +530,9 @@ class TestBodyEveryStreet:
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
-            _PlayerAction('blak_douglas', Action.CHECK, None),
-            _PlayerAction('flettl2', Action.BET, 250),
-            _PlayerAction('blak_douglas', Action.CALL, 250),
+            _PlayerAction('blak_douglas', Action.CHECK, 0, 7),
+            _PlayerAction('flettl2', Action.BET, 250, 1),
+            _PlayerAction('blak_douglas', Action.CALL, 250, 7),
         )),
         ('cards', (Card('8c'),)),
         ('players', ('blak_douglas', 'flettl2')),
@@ -545,12 +545,12 @@ class TestBodyEveryStreet:
 
     @pytest.mark.parametrize(('attribute', 'expected_value'), [
         ('actions', (
-            _PlayerAction('blak_douglas', Action.CHECK, None),
-            _PlayerAction('flettl2', Action.BET, 1300),
-            _PlayerAction('blak_douglas', Action.FOLD, None),
-            _PlayerAction('flettl2', Action.RETURN, 1300),
-            _PlayerAction('flettl2', Action.WIN, 1300),
-            _PlayerAction('flettl2', Action.MUCK, None),
+            _PlayerAction('blak_douglas', Action.CHECK, 0, 7),
+            _PlayerAction('flettl2', Action.BET, 1300, 1),
+            _PlayerAction('blak_douglas', Action.FOLD, 0, 7),
+            _PlayerAction('flettl2', Action.RETURN, 1300, 1),
+            _PlayerAction('flettl2', Action.WIN, 1300, 1),
+            _PlayerAction('flettl2', Action.MUCK, 0, 1),
         )),
         ('cards', (Card('Kd'),)),
         ('players', ('blak_douglas', 'flettl2')),

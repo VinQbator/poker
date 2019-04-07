@@ -22,7 +22,7 @@ __all__ = ['PokerStarsHandHistory', 'Notes']
 @implementer(hh.IStreet)
 class _Street(hh._BaseStreet):
     _board_re = re.compile(r"(?<=[\[ ])(..)(?=[\] ])")
-    _action_re = re.compile(r"""(?P<player_name>.*)(?=:):\s+
+    _action_re = re.compile(r"""(?P<player_name>.*)(?=:\s):\s+
                                 (?P<action>\S+)\s?
                                 [\[$€£\s\n]?
                                 ((?<=\[)(?P<cards>.+)(?=\])
@@ -40,6 +40,7 @@ class _Street(hh._BaseStreet):
             'has returned',
             're-buys'
         ]
+
     def _parse_cards(self, boardline):
         cards = self._board_re.findall(boardline)
         cards = tuple(Card(c) for c in cards)
@@ -49,7 +50,6 @@ class _Street(hh._BaseStreet):
             self.cards = (Card(cards[0]), Card(cards[1]), Card(cards[2]))
         else:
             self.cards = (Card(cards[-1]),)
-        
 
     def _parse_actions(self, actionlines):
         actions = []
@@ -79,7 +79,7 @@ class _Street(hh._BaseStreet):
         name_start_index = line.find('to ') + 3
         name = line[name_start_index:]
         amount = amount.replace('$', '').replace('€', '').replace('£', '')
-        return name, Action.RETURN, float(amount)
+        return name, Action.RETURN, float(amount), self._get_seat(name)
 
     def _parse_collected(self, line):
         name_end_index = line.find(' collected', 0)
@@ -89,31 +89,22 @@ class _Street(hh._BaseStreet):
         amount = line[second_space_index + 1:third_space_index]
         amount = amount.replace('$', '').replace('€', '').replace('£', '')
         self.pot = float(amount)
-        return name, Action.WIN, self.pot
+        return name, Action.WIN, self.pot, self._get_seat(name)
 
     def _parse_muck(self, line):
-        colon_index = line.find(':')
+        colon_index = line.rfind(':')
         name = line[:colon_index]
-        return name, Action.MUCK, None
+        return name, Action.MUCK, 0, self._get_seat(name)
 
     def _parse_player_action(self, line):
         match = _Street._action_re.match(line)
         amount = match.group('amount')
-        amount = float(amount) if amount else None
-        return match.group('player_name'), Action(match.group('action')), amount
-        # name, _, action = line.partition(': ')
-        # action, _, amount = action.partition(' ')
-        # amount = amount.split(' ')[-1]
-        # if '[' in amount: amount = ''
-        # try:
-        #     if not amount is None and amount != '':
-        #         return name, Action(action), Decimal(amount.replace('$', '').replace('€', '').replace('£', ''))
-        #     else:
-        #         return name, Action(action), None
-        # except:
-        #     print('\n\nFailed parsing player action:\nLine: %s\nname: %s\naction: %s\namount: %s\n' % (line, name, action, repr(amount)))
-        #     exc_type, exc_value, exc_traceback = sys.exc_info()
-        #     traceback.print_exception(exc_type, exc_value, exc_traceback, limit=10, file=sys.stdout)
+        amount = float(amount) if amount else 0
+        name = match.group('player_name')
+        return name, Action(match.group('action')), amount, self._get_seat(name)
+        
+    def _get_seat(self, player_name):
+        return next((p for p in self._hand_players if p.name == player_name), None).seat
 
 
 @implementer(hh.IHandHistory)
@@ -276,7 +267,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
         start = self._sections[0] + 3
         stop = self._sections[1]
         #self.preflop_actions = tuple(self._splitted[start:stop])
-        self.preflop = _Street(['[]'] + self._splitted[start:stop], StreetName.PREFLOP)
+        self.preflop = _Street(['[]'] + self._splitted[start:stop], StreetName.PREFLOP, self.players)
 
     def _parse_flop(self):
         try:
@@ -286,7 +277,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
             return
         stop = self._splitted.index('', start)
         floplines = self._splitted[start:stop]
-        self.flop = _Street(floplines, StreetName.FLOP)
+        self.flop = _Street(floplines, StreetName.FLOP, self.players)
 
     def _parse_street(self, street):
         try:
@@ -296,7 +287,7 @@ class PokerStarsHandHistory(hh._SplittableHandHistoryMixin, hh._BaseHandHistory)
             return
         stop = self._splitted.index('', start)
         street_actions = self._splitted[start:stop]
-        setattr(self, street, _Street(street_actions, street.upper()))
+        setattr(self, street, _Street(street_actions, street.upper(), self.players))
         #setattr(self, "{}_actions".format(street.lower()), tuple(street_actions[1:]) if street_actions and len(street_actions) > 0 else None)
 
     def _parse_showdown(self):
